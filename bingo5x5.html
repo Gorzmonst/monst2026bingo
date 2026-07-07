@@ -88,19 +88,6 @@
       cursor: pointer;
       box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
-
-    .free-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 0 0 8px #000;
-      z-index: 4;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
@@ -120,34 +107,36 @@
   <script>
     // 5x5用にデータを拡張（既存の画像を繰り返し使用）
     const bingoData = [
-      { normal: "images/daru_1.webp", alt: "images/daru_2.webp" },
+      //1
       { normal: "images/koyuki_1.webp", alt: "images/koyuki_2.webp" },
-      { normal: "images/opeko_1.webp", alt: "images/opeko_2.webp" },
-      { normal: "images/kuon_1.webp", alt: "images/kuon_2.webp" },
-      { normal: "images/satori_1.webp", alt: "images/satori_2.webp" },
-      { normal: "images/masamune_1.webp", alt: "images/masamune_2.webp" },
-      { normal: "images/guilty_1.webp", alt: "images/guilty_2.webp" },
-      { normal: "images/sanzu_1.webp", alt: "images/sanzu_2.webp" },
-      // 繰り返し使用（5x5=25マス）
-      { normal: "images/daru_1.webp", alt: "images/daru_2.webp" },
-      { normal: "images/koyuki_1.webp", alt: "images/koyuki_2.webp" },
-      { normal: "images/opeko_1.webp", alt: "images/opeko_2.webp" },
-      { normal: "images/kuon_1.webp", alt: "images/kuon_2.webp" },
+      { normal: "images/koba_1.webp", alt: "images/koba_2.webp" },
+      { normal: "images/michael_1.webp", alt: "images/michael_2.webp" },
+      { normal: "images/nightmare_1.webp", alt: "images/nightmare_2.webp" },
+      { normal: "images/lucifer_1.webp", alt: "images/lucifer_2.webp" },
+      //2
+      { normal: "images/Nostradamus_1.webp", alt: "images/Nostradamus_2.webp" },
+      { normal: "images/uriel_1.webp", alt: "images/uriel_2.webp" },
+      { normal: "images/el_1.webp", alt: "images/el_2.webp" },
+      { normal: "images/Yggdrasil_1.webp", alt: "images/Yggdrasil_2.webp" },
+      { normal: "images/pirka_1.webp", alt: "images/pirka_2.webp" },
+      //3
+      { normal: "images/neo_1.webp", alt: "images/neo_2.webp" },
+      { normal: "images/pandora_1.webp", alt: "images/pandora_2.webp" },
       { normal: "images/BINGOFREE.webp", alt: null }, // 中央FREE
-      { normal: "images/satori_1.webp", alt: "images/satori_2.webp" },
-      { normal: "images/masamune_1.webp", alt: "images/masamune_2.webp" },
-      { normal: "images/guilty_1.webp", alt: "images/guilty_2.webp" },
-      { normal: "images/sanzu_1.webp", alt: "images/sanzu_2.webp" },
-      { normal: "images/daru_1.webp", alt: "images/daru_2.webp" },
-      { normal: "images/koyuki_1.webp", alt: "images/koyuki_2.webp" },
-      { normal: "images/opeko_1.webp", alt: "images/opeko_2.webp" },
-      { normal: "images/kuon_1.webp", alt: "images/kuon_2.webp" },
-      { normal: "images/satori_1.webp", alt: "images/satori_2.webp" },
-      { normal: "images/masamune_1.webp", alt: "images/masamune_2.webp" },
-      { normal: "images/guilty_1.webp", alt: "images/guilty_2.webp" },
-      { normal: "images/sanzu_1.webp", alt: "images/sanzu_2.webp" },
-      { normal: "images/daru_1.webp", alt: "images/daru_2.webp" },
-      { normal: "images/koyuki_1.webp", alt: "images/koyuki_2.webp" }
+      { normal: "images/gungnir_1.webp", alt: "images/gungnir_2.webp" },
+      { normal: "images/metatron_1.webp", alt: "images/metatron_2.webp" },
+      //4
+      { normal: "images/benza_1.webp", alt: "images/benza_2.webp" },
+      { normal: "images/snow_1.webp", alt: "images/snow_2.webp" },
+      { normal: "images/apple_1.webp", alt: "images/apple_2.webp" },
+      { normal: "images/sandal_1.webp", alt: "images/sandal_2.webp" },
+      { normal: "images/kityo_1.webp", alt: "images/kityo_2.webp" },
+      //5
+      { normal: "images/raphael_1.webp", alt: "images/raphael_2.webp" },
+      { normal: "images/satan_1.webp", alt: "images/satan_2.webp" },
+      { normal: "images/alice_1.webp", alt: "images/alice_2.webp" },
+      { normal: "images/gabriel_1.webp", alt: "images/gabriel_2.webp" },
+      { normal: "images/nemu_1.webp", alt: "images/nemu_2.webp" },
     ];
 
     const grid = document.getElementById('grid');
@@ -197,12 +186,6 @@
           img.src = data.normal; // BINGOFREE.webp
           cell.appendChild(img);
           cell.style.pointerEvents = 'none';
-
-          // FREEテキストを重ねる
-          const freeText = document.createElement('div');
-          freeText.className = 'free-text';
-          freeText.textContent = 'FREE';
-          cell.appendChild(freeText);
         } else {
           if (savedStates && savedStates[index] !== undefined) {
             img.src = savedStates[index] ? data.alt : data.normal;
