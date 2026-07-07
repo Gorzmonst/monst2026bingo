@@ -23,7 +23,7 @@
     }
 
     .logo {
-      max-width: 340px;
+      max-width: 90%;
       height: auto;
       margin-bottom: 25px;
       filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
@@ -33,14 +33,15 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-      width: 390px;
+      width: 100%;
       margin: 0 auto;
     }
 
     .cell {
       position: relative;
-      width: 120px;
+      width: 100%;
       height: 120px;
+      paddind-top: 100%;
       cursor: pointer;
     }
 
@@ -62,17 +63,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 78%;               /* 枠の内側サイズ調整 */
-      height: 78%;
+      width: 100%;               /* 枠の内側サイズ調整 */
+      height: 100%;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 10px;
       z-index: 3;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       transition: transform 0.2s;
     }
 
     .cell:active .content {
-      transform: translate(-50%, -50%) scale(0.92);
+      transform: translate(-50%, -50%) scale(0.90);
     }
 
     .reset-btn {
