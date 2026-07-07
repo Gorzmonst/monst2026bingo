@@ -112,7 +112,7 @@
       { normal: "koyuki_1.png", alt: "koyuki_2.png" },
       { normal: "opeko_1.png", alt: "opeko_2.png" },
       { normal: "kuon_1.png", alt: "kuon_2.png" },
-      { normal: "BINGOFREE.png", alt: "BINGOFREE.png" },
+      { normal: "BINGOFREE.png", alt: null },
       { normal: "satori_1.png", alt: "satori_2.png" },
       { normal: "masamune_1.png", alt: "masamune_2.png" },
       { normal: "guilty_1.png", alt: "guilty_2.png" },
@@ -166,21 +166,23 @@
 
         cell.appendChild(img);
         cell.appendChild(frame);
+        
+        // 中央以外だけクリックで切り替え
+        if (index !== 4) {   // 4番目 = 中央（0始まり）
+          cell.addEventListener('click', () => {
+            tapSound.currentTime = 0;
+            tapSound.play().catch(() => {});
 
-        // クリック処理
-        cell.addEventListener('click', () => {
-          tapSound.currentTime = 0;
-          tapSound.play().catch(() => {});
-
-          if (img.dataset.state === 'alt') {
-            img.src = data.normal;
-            img.dataset.state = 'normal';
-          } else {
-            img.src = data.alt;
-            img.dataset.state = 'alt';
+            if (img.dataset.state === 'alt') {
+              img.src = data.normal;
+              img.dataset.state = 'normal';
+            } else {
+              img.src = data.alt;
+              img.dataset.state = 'alt';
           }
         });
-
+      }
+          
         grid.appendChild(cell);
       });
     }
