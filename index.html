@@ -2,97 +2,159 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>BINGO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3x3 ビンゴカード</title>
   <style>
     body {
-      background: #111;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f0f0;
       margin: 0;
-      padding: 20px 0;
-    }
-
-    .title-logo {
-      width: 80%;               /* ロゴの大きさ調整 */
-      max-width: 500px;
-      margin: 10px auto 20px;
-      display: block;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
     .bingo-container {
-      position: relative;
-      width: 420px;
-      height: 420px;
-      margin: 0 auto;
+      text-align: center;
     }
 
-    .bingo-bg {
-      width: 100%;
-      height: 100%;
-      background-image: url(BINGO_bg.jpg);
-      background-size: contain;
-      background-repeat: no-repeat;
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
     }
 
     .bingo-grid {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      padding: 45px 35px;        /* ← ここを調整してマス目に合わせる */
+      width: 360px;
+      margin: 0 auto;
+      background: #333;
+      padding: 8px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
-    .bingo-btn {
-      background: rgba(255,255,255,0.08);
-      border: 2px solid transparent;
+    .cell {
+      aspect-ratio: 1 / 1;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .cell:active {
+      transform: scale(0.95);
+    }
+
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .marked {
+      position: relative;
+    }
+
+    .marked::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 80px;
+      color: rgba(255, 50, 50, 0.8);
+      font-weight: bold;
+      pointer-events: none;
+      text-shadow: 0 0 10px white;
+    }
+
+    .reset-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background: #0066ff;
+      color: white;
+      border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .bingo-btn.marked {
-      background: rgba(76, 175, 80, 0.45);
-      border-color: #4caf50;
-      box-shadow: 0 0 20px #4caf50;
     }
   </style>
 </head>
 <body>
-
-  <!-- タイトルロゴ -->
-  <img src="https://media.discordapp.net/attachments/1524044124058288218/1524045102400667658/BINGO.png" 
-       alt="BINGO" class="title-logo">
-
   <div class="bingo-container">
-    <div class="bingo-bg"></div>
+    <h1>3×3 ビンゴカード</h1>
     <div class="bingo-grid" id="grid"></div>
+    <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
   </div>
 
   <script>
-    const clickSound = new Audio("https://freesound.org/data/previews/387/387186_5123854-lq.mp3");
+    // ここに各マスの画像を2種類ずつ設定してください
+    const bingoData = [
+      // 1行目
+      { normal: "https://picsum.photos/id/1015/300/300", alt: "https://picsum.photos/id/201/300/300" },
+      { normal: "https://picsum.photos/id/102/300/300", alt: "https://picsum.photos/id/237/300/300" },
+      { normal: "https://picsum.photos/id/133/300/300", alt: "https://picsum.photos/id/180/300/300" },
+      
+      // 2行目
+      { normal: "https://picsum.photos/id/201/300/300", alt: "https://picsum.photos/id/251/300/300" },
+      { normal: "https://picsum.photos/id/251/300/300", alt: "https://picsum.photos/id/133/300/300" },
+      { normal: "https://picsum.photos/id/180/300/300", alt: "https://picsum.photos/id/1015/300/300" },
+      
+      // 3行目
+      { normal: "https://picsum.photos/id/237/300/300", alt: "https://picsum.photos/id/102/300/300" },
+      { normal: "https://picsum.photos/id/133/300/300", alt: "https://picsum.photos/id/201/300/300" },
+      { normal: "https://picsum.photos/id/180/300/300", alt: "https://picsum.photos/id/251/300/300" }
+    ];
 
     const grid = document.getElementById('grid');
 
-    for (let i = 0; i < 9; i++) {
-      const btn = document.createElement('button');
-      btn.className = 'bingo-btn';
-      btn.dataset.marked = 'false';
+    function createCard() {
+      grid.innerHTML = ''; // クリア
 
-      btn.addEventListener('click', () => {
-        clickSound.currentTime = 0;
-        clickSound.play();
+      bingoData.forEach((data, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = index;
+        cell.dataset.state = 'normal'; // normal or alt
 
-        btn.classList.toggle('marked');
-        btn.dataset.marked = btn.classList.contains('marked') ? 'true' : 'false';
+        const img = document.createElement('img');
+        img.src = data.normal;
+        img.alt = `マス ${index + 1}`;
+
+        cell.appendChild(img);
+        cell.addEventListener('click', () => toggleImage(cell, data));
+        grid.appendChild(cell);
       });
-
-      grid.appendChild(btn);
     }
-  </script>
 
+    function toggleImage(cell, data) {
+      const img = cell.querySelector('img');
+      const currentState = cell.dataset.state;
+
+      if (currentState === 'normal') {
+        img.src = data.alt;
+        cell.dataset.state = 'alt';
+        cell.classList.add('marked');
+      } else {
+        img.src = data.normal;
+        cell.dataset.state = 'normal';
+        cell.classList.remove('marked');
+      }
+    }
+
+    function resetAll() {
+      createCard();
+    }
+
+    // 初回作成
+    window.onload = createCard;
+  </script>
 </body>
 </html>
