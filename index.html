@@ -90,7 +90,11 @@
 </head>
 <body>
   <div class="bingo-container">
-    <img src="BINGO.png" alt="BINGO" class="logo">
+    <!-- タイトルロゴをボタン化 -->
+    <img src="BINGOlogo.png" 
+         alt="BINGO" 
+         class="logo" 
+         id="logoBtn">
 
     <div class="bingo-grid" id="grid"></div>
     
@@ -98,6 +102,9 @@
   </div>
 
   <audio id="tapSound" src="ka-n_2.mp3"></audio>
+  <audio id="bgm" loop>
+    <source src="bgm.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     const bingoData = [
@@ -114,7 +121,28 @@
 
     const grid = document.getElementById('grid');
     const tapSound = document.getElementById('tapSound');
+    const bgm = document.getElementById('bgm');
+    const logoBtn = document.getElementById('logoBtn');
 
+    let bgmStarted = false;
+
+    // ロゴをタップしたらBGM開始
+    logoBtn.addEventListener('click', () => {
+      if (!bgmStarted) {
+        bgm.volume = 0.4;     // 音量調整（0.0〜1.0）
+        bgm.play().catch(() => {});
+        bgmStarted = true;
+        
+        // 軽くアニメーション（押した感）
+        logoBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          logoBtn.style.transform = 'scale(1)';
+        }, 150);
+      }
+    });
+
+    // マスをタップしたときの効果音（今まで通り）
+    // cell.addEventListener('click', () => { ... } の中は変更なし
     function createCard() {
       grid.innerHTML = '';
       
