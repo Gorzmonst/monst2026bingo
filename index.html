@@ -151,7 +151,7 @@
     function createCard() {
       grid.innerHTML = '';
       
-      bingoData.forEach((data) => {
+      bingoData.forEach((data, index) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
 
