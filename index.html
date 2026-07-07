@@ -34,14 +34,14 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       width: 100%;
+      max-width: 450px;        /* 好みで 420〜480px に調整 */
       margin: 0 auto;
     }
 
     .cell {
       position: relative;
       width: 100%;
-      height: 120px;
-      paddind-top: 100%;
+      aspect-ratio: 1 / 1;     /* ← これに変更（padding-top方式から） */
       cursor: pointer;
     }
 
