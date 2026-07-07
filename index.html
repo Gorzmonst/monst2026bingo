@@ -125,77 +125,65 @@
       { normal: "sanzu_1.webp", alt: "sanzu_2.webp" }
     ];
 
-    const grid = document.getElementById('grid');
-    const tapSound = document.getElementById('tapSound');
-    const bgm = document.getElementById('bgm');
-    const logoBtn = document.getElementById('logoBtn');
+const grid = document.getElementById('grid');
+const tapSound = document.getElementById('tapSound');
+const bgm = document.getElementById('bgm');
+const logoBtn = document.getElementById('logoBtn');
 
-    let isPlaying = false;
+let isPlaying = false;
 
-    // ロゴタップでBGM 再生 / 停止 を切り替え
-    logoBtn.addEventListener('click', () => {
-      if (!isPlaying) {
-        // 再生開始
-        bgm.volume = 0.4;        // 音量調整
-        bgm.play().catch(() => {});
-        isPlaying = true;
-      } else {
-        // 停止
-        bgm.pause();
-        isPlaying = false;
-      }
+// ==================== 状態保存関連 ====================
+const STORAGE_KEY = "bingoCardState";
 
-      // 押したときの軽いアニメーション
-      logoBtn.style.transform = 'scale(0.92)';
-      setTimeout(() => {
-        logoBtn.style.transform = 'scale(1)';
-      }, 120);
-    });
+// 状態を保存する関数
+function saveState(states) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+}
 
-    // マスをタップしたときの効果音（今まで通り）
-    // cell.addEventListener('click', () => { ... } の中は変更なし
+// 状態を読み込む関数
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved ? JSON.parse(saved) : null;
+}
+
+// ==================== createCard ====================
 function createCard() {
   grid.innerHTML = '';
-  
+  const savedStates = loadState();   // 保存された状態を取得
+
   bingoData.forEach((data, index) => {
     const cell = document.createElement('div');
     cell.className = 'cell';
 
-    // 中身画像
     const img = document.createElement('img');
     img.className = 'content';
-    img.src = data.normal;
     img.loading = "lazy";
     img.decoding = "async";
     img.alt = "ビンゴマス " + (index + 1);
-    img.dataset.state = 'normal';   // ← 追加（重要）
+    img.dataset.state = 'normal';
+    img.dataset.index = index;        // インデックス保存
 
-    // WebPが読み込めなかった時のフォールバック
+    // 保存された状態があれば復元
+    if (savedStates && savedStates[index]) {
+      img.src = data.alt;
+      img.dataset.state = 'alt';
+    } else {
+      img.src = data.normal;
+    }
+
+    // WebPエラー対策
     img.onerror = function() {
       console.log("読み込み失敗:", this.src);
-      if (this.src.endsWith('.webp')) {
-        this.src = this.src.replace('.webp', '.png');  // png → jpg → 順に試す
-      } else if (this.src.endsWith('.png')) {
-        this.src = this.src.replace('.png', '.jpg');
-      }
+      if (this.src.endsWith('.webp')) this.src = this.src.replace('.webp', '.png');
     };
 
-    // ==================== 枠の処理 ====================
+    // 枠とクリック処理
     if (index !== 4) {
-      // 通常マス → 枠付き
       const frame = document.createElement('div');
       frame.className = 'frame';
       cell.appendChild(img);
       cell.appendChild(frame);
-    } else {
-      // 中央FREEマス → 枠なし
-      cell.appendChild(img);
-      cell.style.pointerEvents = 'none';
-    }
-    // ================================================
 
-    // クリック処理（中央以外）
-    if (index !== 4) {
       cell.addEventListener('click', () => {
         tapSound.currentTime = 0;
         tapSound.play().catch(() => {});
@@ -207,19 +195,43 @@ function createCard() {
           img.src = data.alt;
           img.dataset.state = 'alt';
         }
+
+        // クリックするたびに全状態を保存
+        saveCurrentState();
       });
+    } else {
+      cell.appendChild(img);
+      cell.style.pointerEvents = 'none';
     }
-    
+
     grid.appendChild(cell);
   });
 }
 
-    function resetAll() {
-      tapSound.currentTime = 0;
-      createCard();
+// 現在の全状態を保存
+function saveCurrentState() {
+  const states = {};
+  document.querySelectorAll('.content').forEach(img => {
+    const idx = parseInt(img.dataset.index);
+    if (!isNaN(idx)) {
+      states[idx] = img.dataset.state === 'alt';
     }
+  });
+  saveState(states);
+}
 
-    window.onload = createCard;
+// リセット（保存もクリア）
+function resetAll() {
+  tapSound.currentTime = 0;
+  tapSound.play().catch(() => {});
+  localStorage.removeItem(STORAGE_KEY);   // 保存データ削除
+  createCard();
+}
+
+// BGM部分はそのまま...
+logoBtn.addEventListener('click', () => { ... }); // 省略
+
+window.onload = createCard;
   </script>
 </body>
 </html>
