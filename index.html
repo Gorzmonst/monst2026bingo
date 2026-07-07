@@ -6,8 +6,8 @@
   <title>3x3 ビンゴカード</title>
   <style>
     body {
-      margin: 0;
-      padding: 5px;
+      margin: 0px;
+      padding: 0px;
       min-height: 100vh;
       background: #111 url('background.jpg') center/cover no-repeat fixed;
       display: flex;
@@ -124,21 +124,26 @@
     const bgm = document.getElementById('bgm');
     const logoBtn = document.getElementById('logoBtn');
 
-    let bgmStarted = false;
+    let isPlaying = false;
 
-    // ロゴをタップしたらBGM開始
+    // ロゴタップでBGM 再生 / 停止 を切り替え
     logoBtn.addEventListener('click', () => {
-      if (!bgmStarted) {
-        bgm.volume = 0.4;     // 音量調整（0.0〜1.0）
+      if (!isPlaying) {
+        // 再生開始
+        bgm.volume = 0.4;        // 音量調整
         bgm.play().catch(() => {});
-        bgmStarted = true;
-        
-        // 軽くアニメーション（押した感）
-        logoBtn.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-          logoBtn.style.transform = 'scale(1)';
-        }, 150);
+        isPlaying = true;
+      } else {
+        // 停止
+        bgm.pause();
+        isPlaying = false;
       }
+
+      // 押したときの軽いアニメーション
+      logoBtn.style.transform = 'scale(0.92)';
+      setTimeout(() => {
+        logoBtn.style.transform = 'scale(1)';
+      }, 120);
     });
 
     // マスをタップしたときの効果音（今まで通り）
