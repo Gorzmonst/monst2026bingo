@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>3x3 ビンゴカード</title>
   <style>
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
       padding: 20px;
       min-height: 100vh;
-      background: #111 url('https://picsum.photos/id/1015/1920/1080') center/cover no-repeat fixed; /* ← 背景画像URLに変更 */
+      background: #111 url('background.jpg') center/cover no-repeat fixed;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -26,7 +26,7 @@
     }
 
     .logo {
-      max-width: 320px;     /* ロゴサイズ調整可能 */
+      max-width: 320px;
       height: auto;
       margin-bottom: 15px;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
@@ -51,25 +51,18 @@
       overflow: hidden;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
     }
 
-    .cell:active { transform: scale(0.92); }
+    .cell:active {
+      transform: scale(0.92);
+    }
 
     .cell img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    .marked::after {
-      content: "✓";
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 85px;
-      color: rgba(220, 20, 60, 0.9);
-      text-shadow: 0 0 12px white;
-      pointer-events: none;
+      display: block;
     }
 
     .reset-btn {
@@ -86,7 +79,6 @@
 </head>
 <body>
   <div class="bingo-container">
-    <!-- タイトルロゴ -->
     <img src="BINGO.png" alt="BINGO" class="logo">
 
     <div class="bingo-grid" id="grid"></div>
@@ -94,8 +86,11 @@
     <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
   </div>
 
+  <!-- 効果音 -->
+  <audio id="tapSound" src="ka-n.mp3"></audio>
+
   <script>
-    const bingoData = [ /* ここは前回と同じなので省略 */ 
+    const bingoData = [
       { normal: "https://picsum.photos/id/1015/300/300", alt: "https://picsum.photos/id/201/300/300" },
       { normal: "https://picsum.photos/id/102/300/300", alt: "https://picsum.photos/id/237/300/300" },
       { normal: "https://picsum.photos/id/133/300/300", alt: "https://picsum.photos/id/180/300/300" },
@@ -108,6 +103,7 @@
     ];
 
     const grid = document.getElementById('grid');
+    const tapSound = document.getElementById('tapSound');
 
     function createCard() {
       grid.innerHTML = '';
@@ -121,21 +117,27 @@
         cell.appendChild(img);
 
         cell.addEventListener('click', () => {
+          // 効果音
+          tapSound.currentTime = 0;
+          tapSound.play().catch(() => {});
+
+          // 画像切り替え
           if (cell.dataset.state === 'normal') {
             img.src = data.alt;
             cell.dataset.state = 'alt';
-            cell.classList.add('marked');
           } else {
             img.src = data.normal;
             cell.dataset.state = 'normal';
-            cell.classList.remove('marked');
           }
         });
         grid.appendChild(cell);
       });
     }
 
-    function resetAll() { createCard(); }
+    function resetAll() { 
+      tapSound.currentTime = 0;
+      createCard(); 
+    }
 
     window.onload = createCard;
   </script>
