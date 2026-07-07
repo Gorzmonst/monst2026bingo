@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>BINGO</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px 0;
+    }
+
+    .title-logo {
+      width: 80%;               /* ロゴの大きさ調整 */
+      max-width: 500px;
+      margin: 10px auto 20px;
+      display: block;
+    }
+
+    .bingo-container {
+      position: relative;
+      width: 420px;
+      height: 420px;
+      margin: 0 auto;
+    }
+
+    .bingo-bg {
+      width: 100%;
+      height: 100%;
+      background-image: url('https://media.discordapp.net/attachments/1524044124058288218/1524044646823755890/BINGO.jpg?ex=6a4e50af&is=6a4cff2f&hm=b254206e5259967d38f8b76226ff68105c009ae6f3ce4388ad285f524f38d677&=&format=webp&width=663&height=921');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .bingo-grid {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 45px 35px;        /* ← ここを調整してマス目に合わせる */
+    }
+
+    .bingo-btn {
+      background: rgba(255,255,255,0.08);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .bingo-btn.marked {
+      background: rgba(76, 175, 80, 0.45);
+      border-color: #4caf50;
+      box-shadow: 0 0 20px #4caf50;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- タイトルロゴ -->
+  <img src="https://media.discordapp.net/attachments/1524044124058288218/1524045102400667658/BINGO.png" 
+       alt="BINGO" class="title-logo">
+
+  <div class="bingo-container">
+    <div class="bingo-bg"></div>
+    <div class="bingo-grid" id="grid"></div>
+  </div>
+
+  <script>
+    const clickSound = new Audio("https://freesound.org/data/previews/387/387186_5123854-lq.mp3");
+
+    const grid = document.getElementById('grid');
+
+    for (let i = 0; i < 9; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'bingo-btn';
+      btn.dataset.marked = 'false';
+
+      btn.addEventListener('click', () => {
+        clickSound.currentTime = 0;
+        clickSound.play();
+
+        btn.classList.toggle('marked');
+        btn.dataset.marked = btn.classList.contains('marked') ? 'true' : 'false';
+      });
+
+      grid.appendChild(btn);
+    }
+  </script>
+
+</body>
+</html>
