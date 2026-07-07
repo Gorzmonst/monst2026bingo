@@ -9,65 +9,72 @@
       margin: 0;
       padding: 20px;
       min-height: 100vh;
+      background: #111 url('background.jpg') center/cover no-repeat fixed;
       display: flex;
       justify-content: center;
       align-items: center;
       font-family: 'Helvetica Neue', Arial, sans-serif;
-      position: relative;
     }
 
     .bingo-container {
       text-align: center;
-      background: #111 url('background.jpg') no-repeat;
-      background: contain;
-      padding: 30px 20px;
-      max-width: 100%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      backdrop-filter: blur(8px);           /* ぼかし効果（対応ブラウザのみ） */
     }
 
     .logo {
       max-width: 340px;
       height: auto;
-      margin-bottom: 20px;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));
+      margin-bottom: 25px;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
     }
 
     .bingo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      width: 360px;
+      gap: 12px;
+      width: 390px;
       margin: 0 auto;
-      padding: 10px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
 
     .cell {
-      aspect-ratio: 1 / 1;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
+      position: relative;
+      width: 120px;
+      height: 120px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .cell:active {
-      transform: scale(0.93);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    }
-
-    .cell img {
+    /* 固定の枠（縁） */
+    .frame {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
+      background: url('BINGOBOX.png') center/contain no-repeat; /* ← ここに枠画像 */
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* 中身の画像 */
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 78%;               /* 枠の内側サイズ調整 */
+      height: 78%;
       object-fit: cover;
+      border-radius: 8px;
+      z-index: 1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+
+    .cell:active .content {
+      transform: translate(-50%, -50%) scale(0.92);
     }
 
     .reset-btn {
-      margin-top: 25px;
+      margin-top: 30px;
       padding: 14px 32px;
       font-size: 17px;
       background: rgba(230, 57, 57, 0.95);
@@ -76,11 +83,6 @@
       border-radius: 50px;
       cursor: pointer;
       box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
-    }
-
-    .reset-btn:active {
-      transform: scale(0.95);
     }
   </style>
 </head>
@@ -93,7 +95,6 @@
     <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
   </div>
 
-  <!-- 効果音 -->
   <audio id="tapSound" src="ka-n.mp3"></audio>
 
   <script>
@@ -114,34 +115,44 @@
 
     function createCard() {
       grid.innerHTML = '';
+      
       bingoData.forEach((data) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
-        cell.dataset.state = 'normal';
 
+        // 固定枠
+        const frame = document.createElement('div');
+        frame.className = 'frame';
+
+        // 中身画像
         const img = document.createElement('img');
+        img.className = 'content';
         img.src = data.normal;
-        cell.appendChild(img);
 
+        cell.appendChild(img);
+        cell.appendChild(frame);
+
+        // クリック処理
         cell.addEventListener('click', () => {
           tapSound.currentTime = 0;
           tapSound.play().catch(() => {});
 
-          if (cell.dataset.state === 'normal') {
-            img.src = data.alt;
-            cell.dataset.state = 'alt';
-          } else {
+          if (img.dataset.state === 'alt') {
             img.src = data.normal;
-            cell.dataset.state = 'normal';
+            img.dataset.state = 'normal';
+          } else {
+            img.src = data.alt;
+            img.dataset.state = 'alt';
           }
         });
+
         grid.appendChild(cell);
       });
     }
 
-    function resetAll() { 
+    function resetAll() {
       tapSound.currentTime = 0;
-      createCard(); 
+      createCard();
     }
 
     window.onload = createCard;
