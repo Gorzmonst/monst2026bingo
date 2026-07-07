@@ -53,7 +53,7 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: url('BINGOBOX.webp') center/contain no-repeat;
+      background: url('images/BINGOBOX.webp') center/contain no-repeat;
       z-index: 2;
       pointer-events: none;
     }
@@ -92,7 +92,7 @@
 </head>
 <body>
   <div class="bingo-container">
-    <img src="BINGOlogo.webp" alt="BINGO" class="logo" id="logoBtn">
+    <img src="images/BINGOlogo.webp" alt="BINGO" class="logo" id="logoBtn">
 
     <div class="bingo-grid" id="grid"></div>
     
@@ -106,15 +106,15 @@
 
   <script>
     const bingoData = [
-      { normal: "images/daru_1.webp", alt: "daru_2.webp" },
-      { normal: "koyuki_1.webp", alt: "koyuki_2.webp" },
-      { normal: "opeko_1.webp", alt: "opeko_2.webp" },
-      { normal: "kuon_1.webp", alt: "kuon_2.webp" },
-      { normal: "BINGOFREE.webp", alt: null },
-      { normal: "satori_1.webp", alt: "satori_2.webp" },
-      { normal: "masamune_1.webp", alt: "masamune_2.webp" },
-      { normal: "guilty_1.webp", alt: "guilty_2.webp" },
-      { normal: "sanzu_1.webp", alt: "sanzu_2.webp" }
+      { normal: "images/daru_1.webp", alt: "images/daru_2.webp" },
+      { normal: "images/koyuki_1.webp", alt: "images/koyuki_2.webp" },
+      { normal: "images/opeko_1.webp", alt: "images/opeko_2.webp" },
+      { normal: "images/kuon_1.webp", alt: "images/kuon_2.webp" },
+      { normal: "images/BINGOFREE.webp", alt: null },
+      { normal: "images/satori_1.webp", alt: "images/satori_2.webp" },
+      { normal: "images/masamune_1.webp", alt: "images/masamune_2.webp" },
+      { normal: "images/guilty_1.webp", alt: "images/guilty_2.webp" },
+      { normal: "images/sanzu_1.webp", alt: "images/sanzu_2.webp" }
     ];
 
     const grid = document.getElementById('grid');
@@ -125,7 +125,6 @@
     let isPlaying = false;
     const STORAGE_KEY = "bingoCardState";
 
-    // 状態保存
     function saveState(states) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
     }
@@ -135,14 +134,11 @@
       return saved ? JSON.parse(saved) : null;
     }
 
-    // 現在の状態を保存
     function saveCurrentState() {
       const states = {};
       document.querySelectorAll('.content').forEach(img => {
         const idx = parseInt(img.dataset.index);
-        if (!isNaN(idx)) {
-          states[idx] = img.dataset.state === 'alt';
-        }
+        if (!isNaN(idx)) states[idx] = img.dataset.state === 'alt';
       });
       saveState(states);
     }
@@ -163,7 +159,6 @@
         img.dataset.state = 'normal';
         img.dataset.index = index;
 
-        // 保存状態の復元
         if (savedStates && savedStates[index]) {
           img.src = data.alt;
           img.dataset.state = 'alt';
@@ -171,11 +166,9 @@
           img.src = data.normal;
         }
 
-        // エラー対策
         img.onerror = function() {
-          if (this.src.endsWith('.webp')) {
-            this.src = this.src.replace('.webp', '.png');
-          }
+          console.log("読み込み失敗:", this.src);
+          if (this.src.endsWith('.webp')) this.src = this.src.replace('.webp', '.png');
         };
 
         if (index !== 4) {
@@ -196,7 +189,7 @@
               img.dataset.state = 'alt';
             }
 
-            saveCurrentState();   // クリックごとに保存
+            saveCurrentState();
           });
         } else {
           cell.appendChild(img);
@@ -214,7 +207,6 @@
       createCard();
     }
 
-    // BGMコントロール
     logoBtn.addEventListener('click', () => {
       if (!isPlaying) {
         bgm.volume = 0.4;
