@@ -3,26 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3x3 ビンゴカード</title>
+  <title></title>
   <style>
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
-      background: #f0f0f0;
       margin: 0;
       padding: 20px;
+      min-height: 100vh;
+      background: #111 url('https://picsum.photos/id/1015/1920/1080') center/cover no-repeat fixed; /* ← 背景画像URLに変更 */
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
     }
 
     .bingo-container {
       text-align: center;
+      background: rgba(255,255,255,0.95);
+      padding: 25px 20px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      max-width: 400px;
     }
 
-    h1 {
-      margin-bottom: 10px;
-      color: #333;
+    .logo {
+      max-width: 320px;     /* ロゴサイズ調整可能 */
+      height: auto;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
     }
 
     .bingo-grid {
@@ -31,10 +38,10 @@
       gap: 8px;
       width: 360px;
       margin: 0 auto;
-      background: #333;
+      background: #222;
       padding: 8px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     .cell {
@@ -43,71 +50,58 @@
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
-    .cell:active {
-      transform: scale(0.95);
-    }
+    .cell:active { transform: scale(0.92); }
 
     .cell img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
-    }
-
-    .marked {
-      position: relative;
     }
 
     .marked::after {
       content: "✓";
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 80px;
-      color: rgba(255, 50, 50, 0.8);
-      font-weight: bold;
+      font-size: 85px;
+      color: rgba(220, 20, 60, 0.9);
+      text-shadow: 0 0 12px white;
       pointer-events: none;
-      text-shadow: 0 0 10px white;
     }
 
     .reset-btn {
-      margin-top: 20px;
-      padding: 12px 24px;
-      font-size: 16px;
-      background: #0066ff;
+      margin-top: 25px;
+      padding: 12px 30px;
+      font-size: 17px;
+      background: #e63939;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 50px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="bingo-container">
-    <h1>3×3 ビンゴカード</h1>
+    <!-- タイトルロゴ -->
+    <img src="BINGO.png" alt="BINGO" class="logo">
+
     <div class="bingo-grid" id="grid"></div>
+    
     <button class="reset-btn" onclick="resetAll()">すべてリセット</button>
   </div>
 
   <script>
-    // ここに各マスの画像を2種類ずつ設定してください
-    const bingoData = [
-      // 1行目
+    const bingoData = [ /* ここは前回と同じなので省略 */ 
       { normal: "https://picsum.photos/id/1015/300/300", alt: "https://picsum.photos/id/201/300/300" },
       { normal: "https://picsum.photos/id/102/300/300", alt: "https://picsum.photos/id/237/300/300" },
       { normal: "https://picsum.photos/id/133/300/300", alt: "https://picsum.photos/id/180/300/300" },
-      
-      // 2行目
       { normal: "https://picsum.photos/id/201/300/300", alt: "https://picsum.photos/id/251/300/300" },
       { normal: "https://picsum.photos/id/251/300/300", alt: "https://picsum.photos/id/133/300/300" },
       { normal: "https://picsum.photos/id/180/300/300", alt: "https://picsum.photos/id/1015/300/300" },
-      
-      // 3行目
       { normal: "https://picsum.photos/id/237/300/300", alt: "https://picsum.photos/id/102/300/300" },
       { normal: "https://picsum.photos/id/133/300/300", alt: "https://picsum.photos/id/201/300/300" },
       { normal: "https://picsum.photos/id/180/300/300", alt: "https://picsum.photos/id/251/300/300" }
@@ -116,44 +110,33 @@
     const grid = document.getElementById('grid');
 
     function createCard() {
-      grid.innerHTML = ''; // クリア
-
-      bingoData.forEach((data, index) => {
+      grid.innerHTML = '';
+      bingoData.forEach((data) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
-        cell.dataset.index = index;
-        cell.dataset.state = 'normal'; // normal or alt
+        cell.dataset.state = 'normal';
 
         const img = document.createElement('img');
         img.src = data.normal;
-        img.alt = `マス ${index + 1}`;
-
         cell.appendChild(img);
-        cell.addEventListener('click', () => toggleImage(cell, data));
+
+        cell.addEventListener('click', () => {
+          if (cell.dataset.state === 'normal') {
+            img.src = data.alt;
+            cell.dataset.state = 'alt';
+            cell.classList.add('marked');
+          } else {
+            img.src = data.normal;
+            cell.dataset.state = 'normal';
+            cell.classList.remove('marked');
+          }
+        });
         grid.appendChild(cell);
       });
     }
 
-    function toggleImage(cell, data) {
-      const img = cell.querySelector('img');
-      const currentState = cell.dataset.state;
+    function resetAll() { createCard(); }
 
-      if (currentState === 'normal') {
-        img.src = data.alt;
-        cell.dataset.state = 'alt';
-        cell.classList.add('marked');
-      } else {
-        img.src = data.normal;
-        cell.dataset.state = 'normal';
-        cell.classList.remove('marked');
-      }
-    }
-
-    function resetAll() {
-      createCard();
-    }
-
-    // 初回作成
     window.onload = createCard;
   </script>
 </body>
