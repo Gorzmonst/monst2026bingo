@@ -164,9 +164,19 @@
         img.className = 'content';
         img.src = data.normal;
 
-        cell.appendChild(img);
-        cell.appendChild(frame);
-        
+    // ==================== ここから変更 ====================
+    if (index !== 4) {
+      // 通常マス → 枠付き
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+      cell.appendChild(img);
+      cell.appendChild(frame);
+    } else {
+      // 中央FREEマス → 枠なし
+      cell.appendChild(img);
+      cell.style.pointerEvents = 'none';        // クリック無効（FREEなので）
+    }
+    // ==================== ここまで ====================
         // 中央以外だけクリックで切り替え
         if (index !== 4) {   // 4番目 = 中央（0始まり）
           cell.addEventListener('click', () => {
