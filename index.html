@@ -152,32 +152,33 @@
 
     // マスをタップしたときの効果音（今まで通り）
     // cell.addEventListener('click', () => { ... } の中は変更なし
-    function createCard() {
-      grid.innerHTML = '';
-      
-      bingoData.forEach((data, index) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
+function createCard() {
+  grid.innerHTML = '';
+  
+  bingoData.forEach((data, index) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
 
-        // 固定枠
-        const frame = document.createElement('div');
-        frame.className = 'frame';
+    // 中身画像
+    const img = document.createElement('img');
+    img.className = 'content';
+    img.src = data.normal;
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.alt = "ビンゴマス " + (index + 1);
+    img.dataset.state = 'normal';   // ← 追加（重要）
 
-        // 中身画像
-        const img = document.createElement('img');
-        img.className = 'content';
-        img.src = data.normal;
-        img.loading = "lazy";
-        img.decoding = "async";
-        img.alt = "ビンゴマス " + (index + 1);
-        
-        // エラー対策（WebPが読めなかった時のフォールバック）
-        img.onerror = function() {
-          if (this.src.endsWith('.webp')) {
-            this.src = this.src.replace('.webp', '.jpg'); // jpgにフォールバック
-          }
-          
-    // ==================== ここから変更 ====================
+    // WebPが読み込めなかった時のフォールバック
+    img.onerror = function() {
+      console.log("読み込み失敗:", this.src);
+      if (this.src.endsWith('.webp')) {
+        this.src = this.src.replace('.webp', '.png');  // png → jpg → 順に試す
+      } else if (this.src.endsWith('.png')) {
+        this.src = this.src.replace('.png', '.jpg');
+      }
+    };
+
+    // ==================== 枠の処理 ====================
     if (index !== 4) {
       // 通常マス → 枠付き
       const frame = document.createElement('div');
@@ -187,28 +188,29 @@
     } else {
       // 中央FREEマス → 枠なし
       cell.appendChild(img);
-      cell.style.pointerEvents = 'none';        // クリック無効（FREEなので）
+      cell.style.pointerEvents = 'none';
     }
-    // ==================== ここまで ====================
-        // 中央以外だけクリックで切り替え
-        if (index !== 4) {   // 4番目 = 中央（0始まり）
-          cell.addEventListener('click', () => {
-            tapSound.currentTime = 0;
-            tapSound.play().catch(() => {});
+    // ================================================
 
-            if (img.dataset.state === 'alt') {
-              img.src = data.normal;
-              img.dataset.state = 'normal';
-            } else {
-              img.src = data.alt;
-              img.dataset.state = 'alt';
-            }
-          });
+    // クリック処理（中央以外）
+    if (index !== 4) {
+      cell.addEventListener('click', () => {
+        tapSound.currentTime = 0;
+        tapSound.play().catch(() => {});
+
+        if (img.dataset.state === 'alt') {
+          img.src = data.normal;
+          img.dataset.state = 'normal';
+        } else {
+          img.src = data.alt;
+          img.dataset.state = 'alt';
         }
-          
-        grid.appendChild(cell);
       });
     }
+    
+    grid.appendChild(cell);
+  });
+}
 
     function resetAll() {
       tapSound.currentTime = 0;
